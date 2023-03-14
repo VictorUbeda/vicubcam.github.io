@@ -72,17 +72,6 @@ function loadScene()
     
     } );
 
-    glloader.load( 'models/circuito/scene.gltf', function ( gltf ) {
-        gltf.scene.position.y = 1;
-        gltf.scene.rotation.y = -Math.PI/2;
-        esfera.add( gltf.scene );
-    
-    }, undefined, function ( error ) {
-    
-        console.error( error );
-    
-    } );
-
     // Objeto contenedor
     esferaCubo = new THREE.Object3D();
     esferaCubo.position.y = 1.5;
