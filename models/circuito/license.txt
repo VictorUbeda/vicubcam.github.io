@@ -1,0 +1,11 @@
+Model Information:
+* title:	Wii U - Mario Kart 8 - GCN Baby Park
+* source:	https://sketchfab.com/3d-models/wii-u-mario-kart-8-gcn-baby-park-1f5536161faf4730a315632530e1ebb2
+* author:	Garu (https://sketchfab.com/Garu.The.Ninja)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Wii U - Mario Kart 8 - GCN Baby Park" (https://sketchfab.com/3d-models/wii-u-mario-kart-8-gcn-baby-park-1f5536161faf4730a315632530e1ebb2) by Garu (https://sketchfab.com/Garu.The.Ninja) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
