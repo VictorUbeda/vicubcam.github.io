@@ -1,11 +1,11 @@
 Model Information:
-* title:	Ferrari F1 Race Car
-* source:	https://sketchfab.com/3d-models/ferrari-f1-race-car-66f20097764c40bda91e471968baac7d
-* author:	Jit Debnath2442 (https://sketchfab.com/jitdebnath2442)
+* title:	F1 - Lakers
+* source:	https://sketchfab.com/3d-models/f1-lakers-2f9ff728c52249ca90d679b7e533b2e4
+* author:	Mateus Oliveira (https://sketchfab.com/MateusOliveira)
 
 Model License:
 * license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
 * requirements:	Author must be credited. Commercial use is allowed.
 
 If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
-This work is based on "Ferrari F1 Race Car" (https://sketchfab.com/3d-models/ferrari-f1-race-car-66f20097764c40bda91e471968baac7d) by Jit Debnath2442 (https://sketchfab.com/jitdebnath2442) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "F1 - Lakers" (https://sketchfab.com/3d-models/f1-lakers-2f9ff728c52249ca90d679b7e533b2e4) by Mateus Oliveira (https://sketchfab.com/MateusOliveira) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
