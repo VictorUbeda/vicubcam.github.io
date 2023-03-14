@@ -76,6 +76,8 @@ function loadScene()
     scene.add(vehiculo);
     scene.add(circuito);
  
+    vehiculo.position.x = 1;
+    circuito.position.x = 20;
     // Importar un modelo en gltf
    const glloader = new GLTFLoader();
 
