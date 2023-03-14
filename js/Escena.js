@@ -75,17 +75,13 @@ function loadScene()
     circuito = new THREE.Object3D();
     scene.add(vehiculo);
     scene.add(circuito);
-
-    const path ="./images/";
-    
-
+ 
     // Importar un modelo en gltf
    const glloader = new GLTFLoader();
 
    glloader.load( 'models/coche/scene.gltf', function ( gltf ) {
-       gltf.scene.position.y = 1;
-       gltf.scene.rotation.y = -Math.PI/2;
-       gltf.scene.name = 'coche';
+       gltf.scene.name = 'vehiculo';
+       gltf.scene.scale.set(2,2,2);
        vehiculo.add( gltf.scene );
        gltf.scene.traverse(ob=>{
         if(ob.isObject3D) ob.castShadow = true;
@@ -96,6 +92,22 @@ function loadScene()
        console.error( error );
    
    } );
+
+   glloader.load( 'models/circuito/scene.gltf', function ( gltf ) {
+    gltf.scene.name = 'circuito';
+    gltf.scene.scale.set(2,2,2);
+    circuito.add( gltf.scene );
+    gltf.scene.traverse(ob=>{
+     if(ob.isObject3D) ob.castShadow = true;
+ })
+
+}, undefined, function ( error ) {
+
+    console.error( error );
+
+} );
+
+    const path ="./images/";
 
     // Habitacion
     const paredes = [];
