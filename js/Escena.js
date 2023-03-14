@@ -15,8 +15,8 @@ let renderer, scene, camera;
 
 // Otras globales
 let cameraControls, effectController;
-let esferaCubo,cubo,esfera;
-let angulo = 0;
+let esferaCubo,cubo,esfera,suelo;
+let video;
 
 // Acciones
 init();
@@ -30,6 +30,8 @@ function init()
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth,window.innerHeight);
     document.getElementById('container').appendChild( renderer.domElement );
+    renderer.antialias = true;
+    renderer.shadowMap.enabled = true;
 
     // Instanciar el nodo raiz de la escena
     scene = new THREE.Scene();
@@ -42,26 +44,67 @@ function init()
     cameraControls.target.set(0,1,0);
     camera.lookAt(0,1,0);
 
+    // Luces
+    const ambiental = new THREE.AmbientLight(0x222222);
+    scene.add(ambiental);
+    const direccional = new THREE.DirectionalLight(0xFFFFFF,0.3);
+    direccional.position.set(-1,1,-1);
+    direccional.castShadow = true;
+    scene.add(direccional);
+    const puntual = new THREE.PointLight(0xFFFFFF,0.5);
+    puntual.position.set(2,7,-4);
+    scene.add(puntual);
+    const focal = new THREE.SpotLight(0xFFFFFF,0.3);
+    focal.position.set(-2,7,4);
+    focal.target.position.set(0,0,0);
+    focal.angle= Math.PI/7;
+    focal.penumbra = 0.3;
+    focal.castShadow= true;
+    focal.shadow.camera.far = 20;
+    focal.shadow.camera.fov = 80;
+    scene.add(focal);
+    scene.add(new THREE.CameraHelper(focal.shadow.camera));
+
     // Eventos
+    window.addEventListener('resize', updateAspectRatio );
     renderer.domElement.addEventListener('dblclick', animate );
 }
 
 function loadScene()
 {
-    // Material sencillo
-    const material = new THREE.MeshBasicMaterial({color:'yellow',wireframe:true});
+    // Materiales 
+    const path ="./images/";
+    const texcubo = new THREE.TextureLoader().load(path+"wood512.jpg");
+    const texsuelo = new THREE.TextureLoader().load(path+"r_256.jpg");
+    texsuelo.repeat.set(4,3);
+    texsuelo.wrapS= texsuelo.wrapT = THREE.MirroredRepeatWrapping;
+    const entorno = [ path+"posx.jpg", path+"negx.jpg",
+                      path+"posy.jpg", path+"negy.jpg",
+                      path+"posz.jpg", path+"negz.jpg"];
+    const texesfera = new THREE.CubeTextureLoader().load(entorno);
+
+    const matcubo = new THREE.MeshLambertMaterial({color:'yellow',map:texcubo});
+    const matesfera = new THREE.MeshPhongMaterial({color:'white',
+                                                   specular:'gray',
+                                                   shininess: 30,
+                                                   envMap: texesfera });
+    const matsuelo = new THREE.MeshStandardMaterial({color:"rgb(150,150,150)",map:texsuelo});
 
     // Suelo
-    const suelo = new THREE.Mesh( new THREE.PlaneGeometry(10,10, 10,10), material );
+    suelo = new THREE.Mesh( new THREE.PlaneGeometry(10,10, 100,100), matsuelo );
     suelo.rotation.x = -Math.PI/2;
     suelo.position.y = -0.2;
+    suelo.receiveShadow = true;
     scene.add(suelo);
 
     // Esfera y cubo
-    esfera = new THREE.Mesh( new THREE.SphereGeometry(1,20,20), material );
-    cubo = new THREE.Mesh( new THREE.BoxGeometry(2,2,2), material );
+    esfera = new THREE.Mesh( new THREE.SphereGeometry(1,20,20), matesfera );
+    cubo = new THREE.Mesh( new THREE.BoxGeometry(2,2,2), matcubo );
     esfera.position.x = 1;
     cubo.position.x = -1;
+    esfera.castShadow = true;
+    esfera.receiveShadow = true;
+    cubo.castShadow = cubo.receiveShadow = true;
 
     esferaCubo = new THREE.Object3D();
     esferaCubo.add(esfera);
@@ -83,9 +126,14 @@ function loadScene()
         cubo.add(soldado);
         soldado.position.y = 1;
         soldado.name = 'soldado';
+        soldado.traverse(ob=>{
+            if(ob.isObject3D) ob.castShadow = true;
+        });
+        objeto.material.setValues( {map:
+         new THREE.TextureLoader().load("models/soldado/soldado.png")} );
     });
 
-   // Importar un modelo en gltf
+    // Importar un modelo en gltf
    const glloader = new GLTFLoader();
 
    glloader.load( 'models/coche/scene.gltf', function ( gltf ) {
@@ -93,6 +141,9 @@ function loadScene()
        gltf.scene.rotation.y = -Math.PI/2;
        gltf.scene.name = 'robota';
        esfera.add( gltf.scene );
+       gltf.scene.traverse(ob=>{
+        if(ob.isObject3D) ob.castShadow = true;
+    })
    
    }, undefined, function ( error ) {
    
@@ -100,16 +151,47 @@ function loadScene()
    
    } );
 
+    // Habitacion
+    const paredes = [];
+    paredes.push( new THREE.MeshBasicMaterial({side:THREE.BackSide,
+                  map: new THREE.TextureLoader().load(path+"posx.jpg")}) );
+    paredes.push( new THREE.MeshBasicMaterial({side:THREE.BackSide,
+                  map: new THREE.TextureLoader().load(path+"negx.jpg")}) );
+    paredes.push( new THREE.MeshBasicMaterial({side:THREE.BackSide,
+                  map: new THREE.TextureLoader().load(path+"posy.jpg")}) );
+    paredes.push( new THREE.MeshBasicMaterial({side:THREE.BackSide,
+                  map: new THREE.TextureLoader().load(path+"negy.jpg")}) );
+    paredes.push( new THREE.MeshBasicMaterial({side:THREE.BackSide,
+                  map: new THREE.TextureLoader().load(path+"posz.jpg")}) );
+    paredes.push( new THREE.MeshBasicMaterial({side:THREE.BackSide,
+                  map: new THREE.TextureLoader().load(path+"negz.jpg")}) );
+    const habitacion = new THREE.Mesh( new THREE.BoxGeometry(40,40,40),paredes);
+    scene.add(habitacion);
 
+    // Cine
+    video = document.createElement('video');
+    video.src = "./videos/Pixar.mp4";
+    video.load();
+    video.muted = true;
+    video.play();
+    const texvideo = new THREE.VideoTexture(video);
+    const pantalla = new THREE.Mesh(new THREE.PlaneGeometry(20,6, 4,4), 
+                                    new THREE.MeshBasicMaterial({map:texvideo}));
+    pantalla.position.set(0,4.5,-5);
+    scene.add(pantalla);
 }
 
 function setupGUI()
 {
 	// Definicion de los controles
 	effectController = {
-		mensaje: 'Soldado & Robota',
+		mensaje: 'My cinema',
 		giroY: 0.0,
 		separacion: 0,
+		sombras: true,
+		play: function(){video.play();},
+		pause: function(){video.pause();},
+        mute: true,
 		colorsuelo: "rgb(150,150,150)"
 	};
 
@@ -120,9 +202,33 @@ function setupGUI()
 	const h = gui.addFolder("Control esferaCubo");
 	h.add(effectController, "mensaje").name("Aplicacion");
 	h.add(effectController, "giroY", -180.0, 180.0, 0.025).name("Giro en Y");
-	h.add(effectController, "separacion", { 'Ninguna': 0, 'Media': 2, 'Total': 5 }).name("Separacion");
-    h.addColor(effectController, "colorsuelo").name("Color alambres");
+	h.add(effectController, "separacion", { 'Ninguna': 0, 'Media': 2, 'Total': 5 })
+     .name("Separacion")
+     .onChange(s=>{
+        cubo.position.set( -1-s/2, 0, 0 );
+        esfera.position.set( 1+s/2, 0, 0 );
+     });
+	h.add(effectController, "sombras")
+      .onChange(v=>{
+        cubo.castShadow = v;
+        esfera.castShadow = v;
+      });
+    h.addColor(effectController, "colorsuelo")
+     .name("Color moqueta")
+     .onChange(c=>{suelo.material.setValues({color:c})});
+    const videofolder = gui.addFolder("Control video");
+    videofolder.add(effectController,"mute").onChange(v=>{video.muted = v});
+	videofolder.add(effectController,"play");
+	videofolder.add(effectController,"pause");
 
+}
+
+function updateAspectRatio()
+{
+    const ar = window.innerWidth/window.innerHeight;
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    camera.aspect = ar;
+    camera.updateProjectionMatrix();
 }
 
 function animate(event)
@@ -161,14 +267,9 @@ function animate(event)
 
 function update()
 {
-    angulo += 0.01;
-    //esferaCubo.rotation.y = angulo;
-
-    // Lectura de controles en GUI (es mejor hacerlo con onChange)
-	cubo.position.set( -1-effectController.separacion/2, 0, 0 );
-	esfera.position.set( 1+effectController.separacion/2, 0, 0 );
-	cubo.material.setValues( { color: effectController.colorsuelo } );
+	// Lectura de controles en GUI (mejor hacerlo como callback)
 	esferaCubo.rotation.y = effectController.giroY * Math.PI/180;
+
     TWEEN.update();
 }
 
